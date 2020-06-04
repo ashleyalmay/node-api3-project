@@ -1,9 +1,8 @@
 const express = require('express');
-
 const router = express.Router();
-
 const db = require('./postDb')
-//checked
+
+//checked and check 2
 router.get('/', (req, res) => {
   db.get()
   .then(posts =>{
@@ -15,13 +14,12 @@ router.get('/', (req, res) => {
 });
 //checked
 router.get('/:id',postId, (req, res) => {
-  // do your magic!
   db.getById(req.params.id)
-      .then(post =>{
-        if(post.length==0){
-            res.status(404).json({message: "The post with the specified ID does not exist." })
+      .then(users =>{
+        if(users.length==0){
+            res.status(404).json({message: "The user with the specified ID does not exist." })
          }else{
-             res.status(200).json(post);
+             res.status(200).json(users);
          }
      })
      .catch(error => {
@@ -29,55 +27,41 @@ router.get('/:id',postId, (req, res) => {
      })
 });
 //checked
-router.delete('/:id',postId, (req, res) => {
-   //finds post
-   db.getById(req.params.id)
-   .then(post =>{
-       //removes post
-       db.remove(req.params.id)
-       .then(removePost =>{
-               //if the post was deleted 
-               res.status(200).json(post);
-       })
-       .catch(error =>{
-           res.status(500).json({ error: "The post information could not be retrieved." })
-       })
-   })
-   .catch(error => {
-       res.status(404).json({message: "The post with the specified ID does not exist." })
-   })
-});
-//not working in postman
-router.put('/:id',postId, (req, res) => {
-  const id = req.params.id;
-  if (!req.params.id) {
-      res.status(404).json({message: "The post with the specificed ID does not exist."})
-      if (req.body.title !== "" || req.body.contents !== "") {
-          res.status(400).json({errorMessage: "Please provide title and contents for the post."})
+router.delete('/:id', postId, (req, res) => {
+  db.remove(req.params.id)
+  .then(post => {
+      if (post) {
+          res.status(200).json(`succesfully deleted post ${req.params.id}`);
+      } else {
+          res.status(404).json({error: "The post with the specified ID does not exist."})
       }
-  }
-  db.update(req.params.id, req.body)
-  .then((id) => {
-      db.getbyId(req.params.id)
-      .then(post => {
-          res.status(200).json(post)
-      })
-      .catch(error => {res.status(500).json({ error: "The post information could not be modified."});});
   })
-  .catch(error => {res.status(500).json({ error: "The post information could not be modified."});});
 });
 
-// custom middleware
+//check
+router.put('/:id', postId, (req, res) => {
+    db.update(req.params.id, {text: req.body.text},)
+    .then(post => {
+          res.status(200).json(post)
+    }).catch(error => {
+      console.log(error)
+        res.status(500).json({ error: 'The post information could not be modified' })
+    })
+  });
+
+// custom middle
 function postId(req, res, next){
   let emptyArray = []
   let id = req.params.id
   db.get()
   .then(posts => {
-    posts.map(post => {
+    posts.forEach(post => {
       emptyArray.push(post.id)
     })
     function validatePostId(id, emptyArray){
-      if (emptyArray.find(id)){
+      const found = (emptyArray.find(postid=> postid == id
+        ))
+      if (found){
         console.log(`MATCHES!: ${id}`)
       } else {
         console.log(`DOES NOT MATCH!: ${id}` )
@@ -85,6 +69,9 @@ function postId(req, res, next){
     }
     validatePostId(id, emptyArray)
     next()
+  })
+  .catch(error => {
+   console.log(error);
   })
 }
 module.exports = router;
