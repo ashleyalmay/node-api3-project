@@ -22,7 +22,7 @@ server.use(logger);
 // server.use('/api/users', userRouter)
 
 server.get('/', (req, res) => {
-  res.send(<h2>Let's write some middleware!</h2>);
+  res.send("<h2>Let's write some middleware!</h2>");
 });
 // server.get("/", function (req, res) {
 //   res.status(200).json({
@@ -37,6 +37,7 @@ function logger(req, res, next) {
   console.log(req.method)
   console.log(req.url)
   console.log(Date.now())
+  next();
 }
 
 module.exports = server;
