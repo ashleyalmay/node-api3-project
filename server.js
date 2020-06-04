@@ -21,8 +21,11 @@ server.use(logger);
 // server.use('/api/posts', postRouter)
 // server.use('/api/users', userRouter)
 
-server.get('/', (req, res) => {
-  res.send(<h2>Let's write some middleware!</h2>);
+// server.get('/', (req, res) => {
+//   res.send(<h2>Let's write some middleware!</h2>);
+// });
+server.get("/", function (req, res) {
+  res.status(200).json({ environment: process.env.NODE_ENV, port: process.env.PORT });
 });
 
 //custom middleware
