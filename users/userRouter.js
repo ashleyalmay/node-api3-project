@@ -3,7 +3,12 @@ const router = express.Router();
 const db = require('./userDb')
 const postdb = require("../posts/postDb")
 
-//checked and check 2
+/*checked and check 2
+making a new user will give u a user id
+ex:
+{
+	"name":"hello"
+}*/
 router.post('/',validateUser, (req, res) => {
        db.insert(req.body)
        .then(post => {
@@ -15,6 +20,22 @@ router.post('/',validateUser, (req, res) => {
   })
 
 //checked
+/**
+ * adds a post to the user
+ *  this need an users id in the url, 
+ *  this need a object in the body with a text field  
+ * it returns the new post with the id, text and user_id all in one object
+ * ex input
+ *  {
+	    "text":"test"
+    }
+ * ex output
+ * {
+      "id": 42,
+      "text": "test",
+      "user_id": 14
+    }
+ */
   router.post('/:id/posts',validateUserId,validatePost, (req, res) => {
     postdb.insert ({user_id: req.params.id, text: req.body.text})
     .then(post => {
