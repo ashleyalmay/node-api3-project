@@ -97,21 +97,15 @@ router.put('/:id', validateUserId, validateUser, (req, res) => {
 });
 
 // custom middleware
-function validateUserId(req, res, next) {
-  id = req.params.id
-  let emptyArray = []
-  db.get()
-  .then(response => {
-    response.map(user => {
-      emptyArray.push(Number(user.id))
-    })
-    
-    if (!emptyArray.includes(Number(id))) {
-      res.status(404).json({message: "user with this id does not exist"})
-    } else {
-      next()
-    }
-  })
+async function validateUserId(req, res, next){
+  const id = req.param.id
+  const user = await db.getById(id)
+  if (!user){
+    res.status(400).json({message:"invald id"})
+  }else{
+    req.user=user
+  }
+  next()
 }
 
 function validateUser(req, res, next) {
